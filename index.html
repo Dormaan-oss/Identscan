@@ -142,6 +142,17 @@
   .toast.show{ opacity:1; }
 
   ::-webkit-scrollbar{ display:none; }
+
+  #landscapeWarning{
+    display:none; position:fixed; inset:0; background:var(--bg); z-index:999;
+    flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px;
+  }
+  #landscapeWarning .rot{ font-size:44px; margin-bottom:14px; }
+  #landscapeWarning p{ color:var(--text); font-size:15px; max-width:260px; }
+  @media (orientation: landscape){
+    #app{ display:none; }
+    #landscapeWarning{ display:flex; }
+  }
 </style>
 </head>
 <body>
@@ -201,6 +212,11 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div id="landscapeWarning">
+  <div class="rot">📱</div>
+  <p>IdentScan ist nur im Hochformat nutzbar.<br>Bitte Handy aufrecht halten.</p>
+</div>
 
 <script src="assets/tesseract/tesseract.min.js"></script>
 <script src="assets/JsBarcode.all.min.js"></script>
@@ -279,7 +295,7 @@
     if(corrections[rawText]) return { id: corrections[rawText], source:"correction", conf:"high" };
     // 2) normalize letter/digit confusions then test pattern
     const norm = normalizeToDigits(rawText);
-    const isNumeric = /^\d{5,9}$/.test(norm);
+    const isNumeric = /^\d{6,9}$/.test(norm);
     if(!isNumeric) return null;
     // 3) fuzzy match against known-good ids (learned over time)
     const known = bestKnownMatch(norm);
@@ -655,6 +671,11 @@
   function hideBarcode(){ barcodeSheet.style.display = "none"; }
   bcClose.addEventListener("click", hideBarcode);
   barcodeSheet.addEventListener("click", (e) => { if(e.target === barcodeSheet) hideBarcode(); });
+
+  // ---------- Hochformat erzwingen (greift im installierten/eigenständigen App-Modus) ----------
+  if(screen.orientation && screen.orientation.lock){
+    screen.orientation.lock("portrait").catch(() => {});
+  }
 
   // ---------- Initial render from last stored result ----------
   const stored = loadJSON(LS_LAST, null);
