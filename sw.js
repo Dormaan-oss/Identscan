@@ -1,6 +1,6 @@
 // IdentScan Service Worker
 // Version bump = neuer Cache-Name = erzwungenes Update auf allen Geräten.
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = "identscan-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -55,7 +55,7 @@ self.addEventListener("fetch", (event) => {
 
   if (isAppShell) {
     event.respondWith(
-      fetch(req)
+      fetch(req, { cache: "no-store" })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));

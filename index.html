@@ -152,6 +152,9 @@
   @media (orientation: landscape){
     #app{ display:none; }
     #landscapeWarning{ display:flex; }
+  }  .app-version{
+    position:fixed; right:8px; bottom:calc(6px + env(safe-area-inset-bottom)); z-index:5;
+    font-size:10px; color:var(--muted); opacity:0.5; letter-spacing:0.02em; pointer-events:none;
   }
 </style>
 </head>
@@ -218,11 +221,16 @@
   <p>IdentScan ist nur im Hochformat nutzbar.<br>Bitte Handy aufrecht halten.</p>
 </div>
 
+<div class="app-version" id="appVersion"></div>
+
 <script src="assets/tesseract/tesseract.min.js"></script>
 <script src="assets/JsBarcode.all.min.js"></script>
 <script>
 (function(){
   "use strict";
+
+  const APP_VERSION = "v4";
+  document.getElementById("appVersion").textContent = APP_VERSION;
 
   // ---------- Persistence ----------
   const LS_LAST = "identscan_last_v1";
@@ -685,8 +693,11 @@
 
   // ---------- Service worker (mit Update-Hinweis statt stillem Cache-Hänger) ----------
   if("serviceWorker" in navigator){
+    let swReg = null;
+
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("sw.js").then((reg) => {
+        swReg = reg;
         reg.addEventListener("updatefound", () => {
           const installing = reg.installing;
           if(!installing) return;
@@ -704,6 +715,14 @@
         refreshing = true;
         window.location.reload();
       });
+    });
+
+    // Android öffnet installierte PWAs oft aus dem Hintergrund heraus wieder,
+    // ohne einen echten Neustart/Navigation auszulösen - deshalb hier aktiv nachfragen.
+    document.addEventListener("visibilitychange", () => {
+      if(document.visibilityState === "visible" && swReg){
+        swReg.update().catch(()=>{});
+      }
     });
   }
 
