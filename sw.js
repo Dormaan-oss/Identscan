@@ -1,6 +1,6 @@
 // IdentScan Service Worker
 // Version bump = neuer Cache-Name = erzwungenes Update auf allen Geräten.
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = "identscan-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -17,7 +17,9 @@ const PRECACHE_URLS = [
   "./assets/tesseract/tesseract-core-lstm.wasm.js",
   "./assets/tesseract/tesseract-core-lstm.wasm",
   "./assets/tesseract/tesseract-core-simd-lstm.wasm.js",
-  "./assets/tesseract/tesseract-core-simd-lstm.wasm"
+  "./assets/tesseract/tesseract-core-simd-lstm.wasm",
+  "./assets/tesseract/tesseract-core-relaxedsimd-lstm.wasm.js",
+  "./assets/tesseract/tesseract-core-relaxedsimd-lstm.wasm"
 ];
 
 self.addEventListener("install", (event) => {
