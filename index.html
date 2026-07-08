@@ -496,10 +496,27 @@
       renderResults(result);
     }catch(err){
       console.error(err);
-      showToast("Fehler bei der Erkennung. Bitte erneut versuchen.");
+      showErrorDetails(err);
     }finally{
       setOverlay(false);
     }
+  }
+
+  function showErrorDetails(err){
+    const msg = (err && (err.message || err.toString())) || "Unbekannter Fehler";
+    const box = document.createElement("div");
+    box.style.cssText = "position:fixed;left:12px;right:12px;bottom:calc(96px + env(safe-area-inset-bottom));"+
+      "background:#2a1414;border:1px solid var(--red);color:var(--text);border-radius:12px;"+
+      "padding:14px;z-index:80;font-size:12px;max-height:40vh;overflow:auto;";
+    box.innerHTML = "<div style='font-weight:700;margin-bottom:6px;color:#f0b0ae;'>Fehler bei der Erkennung</div>"+
+      "<div style='font-family:var(--mono);white-space:pre-wrap;word-break:break-word;'></div>";
+    box.querySelector("div:last-child").textContent = msg;
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "Schließen";
+    closeBtn.style.cssText = "margin-top:10px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;";
+    closeBtn.addEventListener("click", () => box.remove());
+    box.appendChild(closeBtn);
+    document.body.appendChild(box);
   }
 
   function loadImage(src){
